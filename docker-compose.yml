@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: keycloak-db
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=KmOcgEVUvaYQUz5bzjJ0
+      - POSTGRES_DB=lims
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - keycloak-net
+    ports:
+      - 3303:5432
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.0-0
+    container_name: keycloak-app
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "1888:8080"
+    volumes:
+      - ./extensions:/opt/keycloak/providers
+    depends_on:
+      - postgres
+    networks:
+      - keycloak-net
+
+volumes:
+  pgdata:
+
+networks:
+  keycloak-net:
